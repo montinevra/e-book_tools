@@ -21,7 +21,6 @@ class HtmlFromHocr(HTMLParser):
 			print('<a title="p' + str(page_num) + '" id="p' + str(page_num) + '" epub:type="pagebreak"></a>', end="")
 			is_new_page = False
 
-
 	def handle_endtag(self, tag):
 		if tag in self.skipped_tags:
 			return
@@ -39,9 +38,21 @@ class HtmlFromHocr(HTMLParser):
 			print(data + ' ', end = "")
 
 
-def main(t_argv):
+def parse_file(t_path):
+	global parser
 	global is_new_page
 	global page_num
+
+	file = open(t_path, "r")
+	is_new_page = True
+	page_num = OS.path.splitext(OS.path.basename(t_path))[0][-3:]
+	contents = file.read()
+	parser.feed(contents)
+	file.close()
+
+
+def main(t_argv):
+	global parser
 
 	if len(t_argv) > 1:
 		parser = HtmlFromHocr()
@@ -49,18 +60,10 @@ def main(t_argv):
 			for i in GLOB.glob(j):
 				if OS.path.isdir(i):  
 					# print(i + " is a directory")  
-					pass
+					for k in OS.listdir(i):
+						parse_file(i + k)  
 				elif OS.path.isfile(i):  
-					# print(i + " is a normal file")  
-					file = open(i, "r")
-					is_new_page = True
-					page_num = OS.path.splitext(OS.path.basename(i))[0][-3:]
-					contents = file.read()
-					parser.feed(contents)
-					# print(t_argv)
-					file.close()
-				else:
-					print(i, "is not a file or directory wtf")
+					parse_file(i)
 		parser.close()
 
 
