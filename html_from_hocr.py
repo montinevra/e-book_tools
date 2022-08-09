@@ -56,7 +56,15 @@ def main(t_argv):
 
 	if len(t_argv) > 1:
 		parser = HtmlFromHocr()
-		for j in t_argv[1:(len(t_argv))]:
+		print(
+			"<?xml version='1.0' encoding='utf-8'?>\n" + 
+			'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
+			"<head>\n" + 
+  			" <title></title>\n" +
+			"</head>\n\n" +
+			"<body>\n"
+		)
+		for j in t_argv[1:]:
 			for i in GLOB.glob(j):
 				if OS.path.isdir(i):  
 					# print(i + " is a directory")  
@@ -64,6 +72,7 @@ def main(t_argv):
 						parse_file(i + k)  
 				elif OS.path.isfile(i):  
 					parse_file(i)
+		print("</body>\n</html>\n")
 		parser.close()
 
 
