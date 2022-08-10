@@ -2,6 +2,7 @@
 import os as OS
 import glob as GLOB
 from html.parser import HTMLParser
+from roman_numeral.roman_numeral import roman_from_int
 
 
 class HtmlFromHocr(HTMLParser):
@@ -18,7 +19,7 @@ class HtmlFromHocr(HTMLParser):
 		# 	print(' ' + i[0] + '="' + i[1] + '"', end = '')
 		print(">", end = '')
 		if is_new_page:
-			print('<a title="p' + str(page_num) + '" id="p' + str(page_num) + '" epub:type="pagebreak"></a>', end="")
+			print('<a title="' + str(page_num) + '" id="p' + str(page_num) + '" epub:type="pagebreak"></a>', end="")
 			is_new_page = False
 
 	def handle_endtag(self, tag):
@@ -48,7 +49,7 @@ def parse_file(t_path):
 	prefix = OS.path.splitext(OS.path.basename(t_path))[0][:-3]
 	page_num = OS.path.splitext(OS.path.basename(t_path))[0][-3:]
 	if prefix != "page":
-		pass
+		page_num = roman_from_int(int(page_num)).lower()
 	contents = file.read()
 	parser.feed(contents)
 	file.close()
