@@ -45,7 +45,10 @@ def parse_file(t_path):
 
 	file = open(t_path, "r")
 	is_new_page = True
+	prefix = OS.path.splitext(OS.path.basename(t_path))[0][:-3]
 	page_num = OS.path.splitext(OS.path.basename(t_path))[0][-3:]
+	if prefix != "page":
+		pass
 	contents = file.read()
 	parser.feed(contents)
 	file.close()
