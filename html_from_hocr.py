@@ -39,6 +39,18 @@ class HtmlFromHocr(HTMLParser):
 			print(data + ' ', end = "")
 
 
+def split_prefix_num(name: str):
+	idx: int = 0
+
+	for c in reversed(name):
+		if not c.isdigit():
+			break
+		idx += 1
+	prefix: str = name[:-idx]
+	num: int = int(name[-idx:])
+	return prefix, num
+
+
 def parse_file(t_path):
 	global parser
 	global is_new_page
@@ -46,10 +58,10 @@ def parse_file(t_path):
 
 	file = open(t_path, "r")
 	is_new_page = True
-	prefix = OS.path.splitext(OS.path.basename(t_path))[0][:-3]
-	page_num = OS.path.splitext(OS.path.basename(t_path))[0][-3:]
+	name: str = OS.path.splitext(OS.path.basename(t_path))[0]
+	prefix, page_num = split_prefix_num(name)
 	if prefix != "page":
-		page_num = roman_from_int(int(page_num)).lower()
+		page_num = roman_from_int(page_num).lower()
 	contents = file.read()
 	parser.feed(contents)
 	file.close()
