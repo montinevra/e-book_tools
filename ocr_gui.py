@@ -23,7 +23,7 @@ def main(argv):
 		if event in (sg.WIN_CLOSED, 'Quit'):
 			break
 		elif event == '-FILES_SELECTED-':
-			file_box.update(values=vals['Select files...'].split(';'))
+			file_box.update(values=vals['Select images...'].split(';'))
 		elif event == 'OCR!':
 			if target_dir.get() == '':
 				status_line.update(value="Please select a destination folder", text_color='orange')
