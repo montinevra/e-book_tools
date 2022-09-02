@@ -1,10 +1,15 @@
 import PySimpleGUI as sg
 import subprocess
 import os
+import sys
 
 
 def ocr(files, target_dir):
 	subprocess.call(['bash', os.path.join(os.path.dirname(__file__), 'ocr.sh')] + files, cwd=target_dir)
+
+
+def view_files(path):
+	subprocess.run(open_folder_command + [path])
 
 
 def main(argv):
@@ -15,7 +20,8 @@ def main(argv):
 	layout = [
 			[sg.Input(key='-FILES_SELECTED-', enable_events=True, visible=False), sg.FilesBrowse(lbl_img_select), file_box],
 			[sg.Text('Destination folder:'), target_dir, sg.FolderBrowse()],
-			[sg.Button("OCR!", button_color='green'), status_line, sg.Push(), sg.Button("Quit", button_color='red')],
+			[sg.Button("OCR!", button_color='green'), status_line, sg.pin(sg.Button('View Files', key='-VIEW_FILES-', visible=False)), sg.Push(), sg.Button("Quit", button_color='red')],
+			# [status_line, sg.Button('View Files', key="-VIEW_FILES-", visible=False)],
 			]
 	window = sg.Window('OCR', layout,  resizable=True, font=('', 16))
 
@@ -29,14 +35,26 @@ def main(argv):
 			if target_dir.get() == '':
 				status_line.update(value="Please select a destination folder", text_color='orange')
 				continue
-			window.perform_long_operation(lambda: ocr(file_box.get_list_values(), target_dir.get()), '-OCR_FINISHED-')
+			target = target_dir.get()
+			window.perform_long_operation(lambda: ocr(file_box.get_list_values(), target), '-OCR_FINISHED-')
 			status_line.update(value="OCR-ing!", text_color=None)
+			window['-VIEW_FILES-'].update(visible=False)
 		elif event == '-OCR_FINISHED-':
 			status_line.update(value="OCR finished!", text_color='light green')
+			# window["-VIEW_FILES-"].update(visible=False)
+			window['-VIEW_FILES-'].update(visible=True)
+		elif event == '-VIEW_FILES-':
+			view_files(target)
 	window.close()
 
 
+open_folder_commands = {
+	'darwin': ['open', '--'],
+	'linux2': ['xdg-open', '--'],
+	'win32': ['explorer'],
+}
+open_folder_command = open_folder_commands[sys.platform]
+
 if __name__ == "__main__":
-	import sys
 
 	main(sys.argv)
