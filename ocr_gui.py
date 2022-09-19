@@ -50,7 +50,7 @@ def main(argv):
 
 open_folder_commands = {
 	'darwin': ['open', '--'],
-	'linux2': ['xdg-open', '--'],
+	'linux': ['xdg-open', '--'],
 	'win32': ['explorer'],
 }
 open_folder_command = open_folder_commands[sys.platform]
