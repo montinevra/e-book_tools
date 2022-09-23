@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os as OS
-import glob as GLOB
 from html.parser import HTMLParser
 from roman_numeral.roman_numeral import roman_from_int
 
@@ -51,14 +50,13 @@ def split_prefix_num(name: str):
 	return prefix, num
 
 
-def parse_file(t_path):
+def parse_file(file):
 	global parser
 	global is_new_page
 	global page_num
 
-	file = open(t_path, "r")
 	is_new_page = True
-	name: str = OS.path.splitext(OS.path.basename(t_path))[0]
+	name: str = OS.path.splitext(OS.path.basename(file.name))[0]
 	prefix, page_num = split_prefix_num(name)
 	if prefix != "page":
 		page_num = roman_from_int(page_num).lower()
@@ -67,32 +65,30 @@ def parse_file(t_path):
 	file.close()
 
 
-def main(t_argv):
+def main(args):
 	global parser
 
-	if len(t_argv) > 1:
-		parser = HtmlFromHocr()
-		print(
-			"<?xml version='1.0' encoding='utf-8'?>\n" + 
-			'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
-			"<head>\n" + 
-  			" <title></title>\n" +
-			"</head>\n\n" +
-			"<body>\n"
-		)
-		for j in t_argv[1:]:
-			for i in GLOB.glob(j):
-				if OS.path.isdir(i):  
-					# print(i + " is a directory")  
-					for k in OS.listdir(i):
-						parse_file(i + k)  
-				elif OS.path.isfile(i):  
-					parse_file(i)
-		print("</body>\n</html>\n")
-		parser.close()
+	parser = HtmlFromHocr()
+	print(
+		"<?xml version='1.0' encoding='utf-8'?>\n" + 
+		'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
+		"<head>\n" + 
+		" <title>" + args.title + "</title>\n" +
+		"</head>\n\n" +
+		"<body>\n"
+	)
+	for j in args.file:
+		parse_file(j)
+	print("</body>\n</html>\n")
+	parser.close()
 
 
 if __name__ == "__main__":
-	import sys
+	import argparse
 
-	main(sys.argv)
+	argparser = argparse.ArgumentParser()
+	argparser.add_argument("file", nargs="*", type=argparse.FileType('r'), help="file(s) to convert")
+	argparser.add_argument("-t", "--title", type=str, help="set the title of the ebook")
+	# argparser.add_argument("-p", "--prefix", type=str, help="specify the filename prefix. defaults to 'page'")
+	args = argparser.parse_args()
+	main(args)
