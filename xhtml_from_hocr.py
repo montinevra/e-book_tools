@@ -45,20 +45,21 @@ def split_prefix_num(name: str):
 		if not c.isdigit():
 			break
 		idx += 1
-	prefix: str = name[:-idx]
+	file_prefix: str = name[:-idx]
 	num: int = int(name[-idx:])
-	return prefix, num
+	return file_prefix, num
 
 
 def parse_file(file):
 	global parser
 	global is_new_page
 	global page_num
+	global prefix
 
 	is_new_page = True
 	name: str = OS.path.splitext(OS.path.basename(file.name))[0]
-	prefix, page_num = split_prefix_num(name)
-	if prefix != "page":
+	file_prefix, page_num = split_prefix_num(name)
+	if file_prefix != prefix:
 		page_num = roman_from_int(page_num).lower()
 	contents = file.read()
 	parser.feed(contents)
@@ -67,8 +68,14 @@ def parse_file(file):
 
 def main(args):
 	global parser
+	global prefix
 
 	parser = HtmlFromHocr()
+	if args.prefix:
+		prefix = args.prefix 
+	else:
+		prefix = "page"
+ 
 	print(
 		"<?xml version='1.0' encoding='utf-8'?>\n" + 
 		'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
@@ -89,6 +96,6 @@ if __name__ == "__main__":
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument("file", nargs="*", type=argparse.FileType('r'), help="file(s) to convert")
 	argparser.add_argument("-t", "--title", type=str, help="set the title of the ebook")
-	# argparser.add_argument("-p", "--prefix", type=str, help="specify the filename prefix. defaults to 'page'")
+	argparser.add_argument("-p", "--prefix", type=str, help="Specify the filename prefix. Defaults to 'page'. Filenames with this prefix are considered main body matarial. All other files are considered front material and will be numbered using roman numerals.")
 	args = argparser.parse_args()
 	main(args)
