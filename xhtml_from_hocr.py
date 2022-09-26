@@ -18,7 +18,7 @@ class HtmlFromHocr(HTMLParser):
 		# 	print(' ' + i[0] + '="' + i[1] + '"', end = '')
 		print(">", end = '')
 		if is_new_page:
-			print('<a title="' + str(page_num) + '" id="p' + str(page_num) + '" epub:type="pagebreak"></a>', end="")
+			print(f'<a title="{page_num}" id="p{page_num}" epub:type="pagebreak"></a>', end="")
 			is_new_page = False
 
 	def handle_endtag(self, tag):
@@ -80,7 +80,7 @@ def main(args):
 		"<?xml version='1.0' encoding='utf-8'?>\n" + 
 		'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
 		"<head>\n" + 
-		" <title>" + args.title + "</title>\n" +
+		f" <title>{args.title}</title>\n" +
 		"</head>\n\n" +
 		"<body>\n"
 	)
