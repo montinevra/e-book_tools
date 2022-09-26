@@ -66,16 +66,7 @@ def parse_file(file):
 	file.close()
 
 
-def main(args):
-	global parser
-	global prefix
-
-	parser = HtmlFromHocr()
-	if args.prefix:
-		prefix = args.prefix 
-	else:
-		prefix = "page"
- 
+def print_out(args):
 	print(
 		"<?xml version='1.0' encoding='utf-8'?>\n" + 
 		'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
@@ -87,6 +78,23 @@ def main(args):
 	for j in args.file:
 		parse_file(j)
 	print("</body>\n</html>\n")
+
+
+def main(args):
+	global parser
+	global prefix
+
+	parser = HtmlFromHocr()
+	if args.prefix:
+		prefix = args.prefix 
+	else:
+		prefix = "page"
+	if args.output:
+		import sys
+		with args.output as sys.stdout:
+			print_out(args)
+	else:
+		print_out(args)
 	parser.close()
 
 
@@ -95,6 +103,7 @@ if __name__ == "__main__":
 
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument("file", nargs="*", type=argparse.FileType('r'), help="file(s) to convert")
+	argparser.add_argument("-o", "--output", type=argparse.FileType('w'), help="Output file. Defaults to stdout")
 	argparser.add_argument("-t", "--title", type=str, help="set the title of the ebook")
 	argparser.add_argument("-p", "--prefix", type=str, help="Specify the filename prefix. Defaults to 'page'. Filenames with this prefix are considered main body matarial. All other files are considered front material and will be numbered using roman numerals.")
 	args = argparser.parse_args()
