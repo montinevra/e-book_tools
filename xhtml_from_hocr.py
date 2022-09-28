@@ -35,7 +35,7 @@ class HtmlFromHocr(HTMLParser):
 			data = data[0:-1]
 			print(data, end = "")
 		else:
-			print(data + ' ', end = "")
+			print(f'{data} ', end = "")
 
 
 def split_prefix_num(name: str):
