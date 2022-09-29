@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os as OS
-import glob as GLOB
 from html.parser import HTMLParser
 from roman_numeral.roman_numeral import roman_from_int
 
@@ -19,7 +18,7 @@ class HtmlFromHocr(HTMLParser):
 		# 	print(' ' + i[0] + '="' + i[1] + '"', end = '')
 		print(">", end = '')
 		if is_new_page:
-			print('<a title="' + str(page_num) + '" id="p' + str(page_num) + '" epub:type="pagebreak"></a>', end="")
+			print(f'<a title="{page_num}" id="p{page_num}" epub:type="pagebreak"></a>', end="")
 			is_new_page = False
 
 	def handle_endtag(self, tag):
@@ -36,7 +35,7 @@ class HtmlFromHocr(HTMLParser):
 			data = data[0:-1]
 			print(data, end = "")
 		else:
-			print(data + ' ', end = "")
+			print(f'{data} ', end = "")
 
 
 def split_prefix_num(name: str):
@@ -46,53 +45,60 @@ def split_prefix_num(name: str):
 		if not c.isdigit():
 			break
 		idx += 1
-	prefix: str = name[:-idx]
+	file_prefix: str = name[:-idx]
 	num: int = int(name[-idx:])
-	return prefix, num
+	return file_prefix, num
 
 
-def parse_file(t_path):
+def parse_file(file, args):
 	global parser
 	global is_new_page
 	global page_num
 
-	file = open(t_path, "r")
 	is_new_page = True
-	name: str = OS.path.splitext(OS.path.basename(t_path))[0]
-	prefix, page_num = split_prefix_num(name)
-	if prefix != "page":
+	name: str = OS.path.splitext(OS.path.basename(file.name))[0]
+	file_prefix, page_num = split_prefix_num(name)
+	if file_prefix != args.prefix:
 		page_num = roman_from_int(page_num).lower()
 	contents = file.read()
 	parser.feed(contents)
 	file.close()
 
 
-def main(t_argv):
+def print_out(args):
+	print(
+		"<?xml version='1.0' encoding='utf-8'?>\n" + 
+		'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
+		"<head>\n" + 
+		f" <title>{args.title}</title>\n" +
+		"</head>\n\n" +
+		"<body>\n"
+	)
+	for j in args.file:
+		parse_file(j, args)
+	print("</body>\n</html>\n")
+
+
+def main(args):
 	global parser
 
-	if len(t_argv) > 1:
-		parser = HtmlFromHocr()
-		print(
-			"<?xml version='1.0' encoding='utf-8'?>\n" + 
-			'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
-			"<head>\n" + 
-  			" <title></title>\n" +
-			"</head>\n\n" +
-			"<body>\n"
-		)
-		for j in t_argv[1:]:
-			for i in GLOB.glob(j):
-				if OS.path.isdir(i):  
-					# print(i + " is a directory")  
-					for k in OS.listdir(i):
-						parse_file(i + k)  
-				elif OS.path.isfile(i):  
-					parse_file(i)
-		print("</body>\n</html>\n")
-		parser.close()
+	parser = HtmlFromHocr()
+	if args.output:
+		import sys
+		with args.output as sys.stdout:
+			print_out(args)
+	else:
+		print_out(args)
+	parser.close()
 
 
 if __name__ == "__main__":
-	import sys
+	import argparse
 
-	main(sys.argv)
+	argparser = argparse.ArgumentParser()
+	argparser.add_argument("file", nargs="*", type=argparse.FileType('r'), help="file(s) to convert")
+	argparser.add_argument("-o", "--output", type=argparse.FileType('w'), help="Output file. Defaults to stdout")
+	argparser.add_argument("-p", "--prefix", type=str, default="page", help="Specify the filename prefix. Defaults to 'page'. Filenames with this prefix are considered main body matarial. All other files are considered front material and will be numbered using roman numerals.")
+	argparser.add_argument("-t", "--title", type=str, help="set the title of the ebook")
+	args = argparser.parse_args()
+	main(args)
