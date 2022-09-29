@@ -98,7 +98,7 @@ if __name__ == "__main__":
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument("file", nargs="*", type=argparse.FileType('r'), help="file(s) to convert")
 	argparser.add_argument("-o", "--output", type=argparse.FileType('w'), help="Output file. Defaults to stdout")
-	argparser.add_argument("-P", "--prefix", type=str, default="page", help="Specify the filename prefix. Defaults to 'page'. Filenames with this prefix are considered main body matarial. All other files are considered front material and will be numbered using roman numerals.")
+	argparser.add_argument("-p", "--prefix", type=str, default="page", help="Specify the filename prefix. Defaults to 'page'. Filenames with this prefix are considered main body matarial. All other files are considered front material and will be numbered using roman numerals.")
 	argparser.add_argument("-t", "--title", type=str, help="set the title of the ebook")
 	args = argparser.parse_args()
 	main(args)
