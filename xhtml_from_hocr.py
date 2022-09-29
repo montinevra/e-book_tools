@@ -50,8 +50,7 @@ def split_prefix_num(name: str):
 	return file_prefix, num
 
 
-def parse_file(file, args):
-	global parser
+def parse_file(file, args, parser):
 	global is_new_page
 	global page_num
 
@@ -66,6 +65,7 @@ def parse_file(file, args):
 
 
 def print_out(args):
+	parser = HtmlFromHocr()
 	print(
 		"<?xml version='1.0' encoding='utf-8'?>\n" + 
 		'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n' +
@@ -75,21 +75,18 @@ def print_out(args):
 		"<body>\n"
 	)
 	for j in args.file:
-		parse_file(j, args)
+		parse_file(j, args, parser)
 	print("</body>\n</html>\n")
+	parser.close()
 
 
 def main(args):
-	global parser
-
-	parser = HtmlFromHocr()
 	if args.output:
 		import sys
 		with args.output as sys.stdout:
 			print_out(args)
 	else:
 		print_out(args)
-	parser.close()
 
 
 if __name__ == "__main__":
