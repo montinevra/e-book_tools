@@ -58,7 +58,10 @@ def parse_file(file, args, parser):
 	name: str = OS.path.splitext(OS.path.basename(file.name))[0]
 	file_prefix, page_num = split_prefix_num(name)
 	if file_prefix != args.prefix:
+		page_num += args.foffset
 		page_num = roman_from_int(page_num).lower()
+	else:
+		page_num += args.offset
 	contents = file.read()
 	parser.feed(contents)
 	file.close()
@@ -94,6 +97,8 @@ if __name__ == "__main__":
 
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument("file", nargs="*", type=argparse.FileType('r'), help="File(s) to convert.")
+	argparser.add_argument("-F", "--foffset", type=int, default=0, help="Same as -O, but for front matter.")
+	argparser.add_argument("-O", "--offset", type=int, default=0, help="Offset the page number of main body matter by this amount. Useful if the filename does not match the page number. For example, if page001.jpg contains page 3, set this to 2. Can be nagative.")
 	argparser.add_argument("-o", "--output", type=argparse.FileType('w'), help="Output file. Defaults to stdout.")
 	argparser.add_argument("-p", "--prefix", type=str, default="page", help="Specify the filename prefix. Defaults to 'page'. Filenames with this prefix are considered main body matarial. All other files are considered front material and will be numbered using roman numerals.")
 	argparser.add_argument("-t", "--title", type=str, help="Set the title of the ebook.")
