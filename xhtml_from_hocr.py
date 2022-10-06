@@ -13,7 +13,7 @@ class HtmlFromHocr(HTMLParser):
 
 		if tag in self.skipped_tags:
 			return
-		print("<" + tag, end = '')
+		print(f"<{tag}", end = '')
 		# for i in attrs:
 		# 	print(' ' + i[0] + '="' + i[1] + '"', end = '')
 		print(">", end = '')
@@ -24,7 +24,7 @@ class HtmlFromHocr(HTMLParser):
 	def handle_endtag(self, tag):
 		if tag in self.skipped_tags:
 			return
-		print("</" + tag + ">")
+		print(f"</{tag}>")
 		if tag == "p":
 			print("\n")
 
