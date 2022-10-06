@@ -39,12 +39,9 @@ class HtmlFromHocr(HTMLParser):
 
 
 def split_prefix_num(name: str):
-	idx: int = 0
-
-	for c in reversed(name):
+	for idx, c in enumerate(reversed(name)):
 		if not c.isdigit():
 			break
-		idx += 1
 	file_prefix: str = name[:-idx]
 	num: int = int(name[-idx:])
 	return file_prefix, num
