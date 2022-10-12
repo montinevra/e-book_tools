@@ -98,7 +98,7 @@ if __name__ == "__main__":
 	argparser.add_argument("-l", "--language", type=str, default="en", help="Set the LCID for the document. Defaults to 'en'.")
 	argparser.add_argument("-O", "--offset", type=int, default=0, help="Offset the page number of main body matter by this amount. Useful if the filename does not match the page number. For example, if page001.jpg contains page 3, set this to 2. Can be nagative.")
 	argparser.add_argument("-o", "--output", type=argparse.FileType('w'), help="Output file. Defaults to stdout.")
-	argparser.add_argument("-p", "--prefix", type=str, default="page", help="Specify the filename prefix. Defaults to 'page'. Filenames with this prefix are considered main body matarial. All other files are considered front material and will be numbered using roman numerals.")
+	argparser.add_argument("-p", "--prefix", type=str, default="page", help="Specify the filename prefix. Defaults to 'page'. Filenames with this prefix are considered main body matter. All other files are considered front matter and will be numbered using roman numerals.")
 	argparser.add_argument("-t", "--title", type=str, help="Set the title of the ebook.")
 	args = argparser.parse_args()
 	main(args)
