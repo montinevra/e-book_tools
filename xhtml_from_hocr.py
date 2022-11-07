@@ -48,21 +48,21 @@ def split_prefix_num(name: str):
 	return file_prefix, num
 
 
-def parse_file(file, args, parser):
+def parse_file(file_path, args, parser):
 	global is_new_page
 	global page_num
 
 	is_new_page = True
-	name: str = OS.path.splitext(OS.path.basename(file.name))[0]
+	name: str = OS.path.splitext(OS.path.basename(file_path))[0]
 	file_prefix, page_num = split_prefix_num(name)
 	if file_prefix != args.prefix:
 		page_num += args.foffset
 		page_num = roman_from_int(page_num).lower()
 	else:
 		page_num += args.offset
-	contents = file.read()
-	parser.feed(contents)
-	file.close()
+	with open(file_path, 'r') as file:
+		contents = file.read()
+		parser.feed(contents)
 
 
 def print_out(args):
@@ -75,7 +75,7 @@ def print_out(args):
 		"</head>\n\n" +
 		"<body>\n"
 	)
-	for j in args.file:
+	for j in args.file_path:
 		parse_file(j, args, parser)
 	print("</body>\n</html>\n")
 	parser.close()
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 	import argparse
 
 	argparser = argparse.ArgumentParser()
-	argparser.add_argument("file", nargs="*", type=argparse.FileType('r'), help="File(s) to convert.")
+	argparser.add_argument("file_path", nargs="*", type=str, help="File(s) to convert.")
 	argparser.add_argument("-F", "--foffset", type=int, default=0, help="Same as -O, but for front matter.")
 	argparser.add_argument("-l", "--language", type=str, default="en", help="Set the LCID for the document. Defaults to 'en'.")
 	argparser.add_argument("-O", "--offset", type=int, default=0, help="Offset the page number of main body matter by this amount. Useful if the filename does not match the page number. For example, if page001.jpg contains page 3, set this to 2. Can be nagative.")
