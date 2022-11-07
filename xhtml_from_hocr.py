@@ -2,6 +2,7 @@
 import os as OS
 from html.parser import HTMLParser
 from roman_numeral.roman_numeral import roman_from_int
+import html
 
 
 class HtmlFromHocr(HTMLParser):
@@ -33,9 +34,9 @@ class HtmlFromHocr(HTMLParser):
 			return
 		if data[-1] == "-":
 			data = data[0:-1]
-			print(data, end = "")
+			print(html.escape(data), end = "")
 		else:
-			print(f'{data} ', end = "")
+			print(f'{html.escape(data)} ', end = "")
 
 
 def split_prefix_num(name: str):
